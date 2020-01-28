@@ -1,107 +1,74 @@
-import React, { Component } from "react";
+import React from "react";
+import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
+import { ThemeProvider as MuiThemeProvider } from '@material-ui/core/styles';
+import withTheme from '@material-ui/core/styles/withTheme';
 import "./App.css";
-import TextField from "@material-ui/core/TextField";
-import Button from "@material-ui/core/Button";
 import axios from "axios";
 
-class App extends Component {
+import Login from "./Login"
+import Tasks from "./Tasks"
+
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      main: '#673ab7',
+      light: '#9a67ea',
+      dark: '#320b86',
+      contrastText: '#ffffff'
+    },
+    secondary: {
+      main: '#6a1b9a',
+      light: '#9c4dcc',
+      dark: '#38006b',
+      contrastText: '#ffffff',
+    },
+  },
+  typography: {
+    fontFamily: "'Work Sans', sans-serif",
+    useNextVariants: true,
+  },
+});
+
+
+class App extends React.Component {
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
-      username: "",
-      password: "",
-      email: ""
-    };
+      user: window.user
+    }
   }
-  handleChange = name => event => {
+
+  componentDidMount() {
+    axios.post('/api/whoami')
+      .then(res => {
+        if (res.data) {
+          window.user = res.data
+          this.setDetails()
+        }
+      })
+      .catch(e => {
+        console.log(e);
+      })
+  }
+
+  setDetails = () => {
     this.setState({
-      [name]: event.target.value
-    });
-  };
-  signin = () => {
-    var info = {
-      user: this.state.username,
-      pass: this.state.password
-    };
-    axios
-      .post("/api/signin", info)
-      .then(res => {
-        console.log(info);
-      })
-      .catch(e => {
-        console.log(e);
-      });
-  };
-  signup = () => {
-    var info = {
-      user: this.state.username,
-      email: this.state.email,
-      pass: this.state.password
-    };
-    axios
-      .post("/api/signup", info)
-      .then(res => {
-        console.log(info);
-      })
-      .catch(e => {
-        console.log(e);
-      });
-  };
+      user: window.user
+    })
+  }
 
   render() {
     return (
-      <div className="App">
-        <div>
-          <TextField
-            label="Username"
-            variant="outlined"
-            value={this.state.username}
-            onChange={this.handleChange("username")}
-          />
-          <TextField
-            label="Password"
-            variant="outlined"
-            value={this.state.password}
-            onChange={this.handleChange("password")}
-          />
-          <Button
-            onClick={this.signin}
-            color="primary"
-            variant="outlined"
-          >
-            {"Sign In"}
-          </Button>
-        </div>
-        <div>
-          <TextField
-            label="Username"
-            variant="outlined"
-            value={this.state.username}
-            onChange={this.handleChange("username")}
-          />
-          <TextField
-            label="Email"
-            variant="outlined"
-            value={this.state.email}
-            onChange={this.handleChange("email")}
-          />
-          <TextField
-            label="Password"
-            variant="outlined"
-            value={this.state.password}
-            onChange={this.handleChange("password")}
-          />
-          <Button
-            onClick={this.signup}
-            color="primary"
-            variant="outlined"
-          >
-            {"Sign Up"}
-          </Button>
-        </div>
-      </div>
-    );
+      <MuiThemeProvider theme={theme}>
+        {!this.state.user &&
+          <Login setDetails={this.setDetails} />
+        }
+        {this.state.user &&
+          <Tasks />
+        }
+      </MuiThemeProvider>
+    )
   }
 }
 
-export default App;
+export default withTheme(App);

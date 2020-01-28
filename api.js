@@ -19,9 +19,15 @@ function hash(input, salt) {
   return ["pdkdf2", "10000", salt, hashed.toString("hex")].join("$");
 }
 
-// api.post("/whoami", (req, res, next) => {
-
-// })
+// Endpoint: /api/whoami
+api.post("/whoami", (req, res) => {
+  if (req.session.user) {
+    var id = req.session.user
+    res.status(200).send(id)
+  }
+  else
+    res.send(null)
+})
 
 
 // Endpoint: /api/signup
@@ -42,9 +48,19 @@ api.post("/signup", (req, res, next) => {
       }
       else
         console.log("Sign Up Success");
-    }
-  );
-});
+      pool.query(`SELECT id,password FROM users WHERE username = $1`, [user]
+        , (err, results) => {
+          if (err) {
+            console.log(err.toString);
+            res.status(500).send({ error: "Something's fishy" })
+          }
+          else
+            req.session.user = results.rows[0].id
+          res.status(200).send(req.session)
+        }
+      );
+    });
+})
 
 // Endpoint: /api/signin
 api.post("/signin", (req, res, next) => {
@@ -71,8 +87,8 @@ api.post("/signin", (req, res, next) => {
           var givenhashed = hash(pass, salt)
           if (givenhashed === actualhashed) {
             console.log("Signed in");
-            // console.log(results.rows[0]);
-            req.session = results.rows[0].id
+            req.session.user = results.rows[0].id
+            res.status(200).send(req.session)
           }
           else {
             res.status(403).send({ error: "This is why I told you not to forget you're password" })
@@ -81,5 +97,17 @@ api.post("/signin", (req, res, next) => {
         }
     })
 });
+
+api.post('/signout', (req, res) => {
+  delete req.session.user
+  res.status(200).send({ message: "See you later" })
+})
+
+api.use((req, res, next) => {
+  if (req.session.user)
+    next()
+  else
+    res.status(401).send({ error: 'I think you forgot to sign in.' })
+})
 
 module.exports = api;
