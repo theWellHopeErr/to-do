@@ -11,15 +11,15 @@ import Tasks from "./Tasks"
 const theme = createMuiTheme({
   palette: {
     primary: {
-      main: '#673ab7',
-      light: '#9a67ea',
-      dark: '#320b86',
+      main: '#fc0303',
+      light: '#ea6767',
+      dark: '#860b0b',
       contrastText: '#ffffff'
     },
     secondary: {
-      main: '#6a1b9a',
-      light: '#9c4dcc',
-      dark: '#38006b',
+      main: '#e09728',
+      light: '#c6cc4d',
+      dark: '#6b0000',
       contrastText: '#ffffff',
     },
   },
