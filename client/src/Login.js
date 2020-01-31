@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import Paper from "@material-ui/core/Paper";
@@ -95,12 +96,12 @@ class Login extends Component {
   };
 
   signIn = () => {
-    var info = {
+    var body = {
       user: this.state.username,
       pass: this.state.password
     };
     axios
-      .post("/api/signin", info)
+      .post("/api/signin", body)
       .then(res => {
         window.user = res.data.user
         this.props.setDetails();
@@ -111,13 +112,13 @@ class Login extends Component {
   };
 
   signUp = () => {
-    var info = {
+    var body = {
       user: this.state.username,
       email: this.state.email,
       pass: this.state.password
     };
     axios
-      .post("/api/signup", info)
+      .post("/api/signup", body)
       .then(res => {
         console.log(res);
         window.user = res.data.user

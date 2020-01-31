@@ -13,11 +13,13 @@ var pool = new Pool({
   ssl: true
 });
 
+
 // Hashing Function
 function hash(input, salt) {
   var hashed = crypto.pbkdf2Sync(input, salt, 10000, 512, "sha512");
   return ["pdkdf2", "10000", salt, hashed.toString("hex")].join("$");
 }
+
 
 // Endpoint: /api/whoami
 api.post("/whoami", (req, res) => {
@@ -62,6 +64,7 @@ api.post("/signup", (req, res, next) => {
     });
 })
 
+
 // Endpoint: /api/signin
 api.post("/signin", (req, res, next) => {
   if (req.body.user && req.body.pass)
@@ -98,6 +101,8 @@ api.post("/signin", (req, res, next) => {
     })
 });
 
+
+// Endpoint: /api/signout
 api.post('/signout', (req, res) => {
   delete req.session.user
   res.status(200).send({ message: "See you later" })
@@ -109,5 +114,34 @@ api.use((req, res, next) => {
   else
     res.status(401).send({ error: 'I think you forgot to sign in.' })
 })
+
+
+//Endpoint: /api/new-task
+api.post('/new-task', (req, res, next) => {
+  if (req.body.userID && req.body.task)
+    next()
+  else {
+    res.status(400).send({ error: "Request body is incomplete" })
+  }
+}
+  , (req, res) => {
+    var id = req.body.userID
+    console.log(id);
+
+    var { userID, task } = req.body
+    console.log(userID, task);
+    pool.query(`INSERT INTO tasks (userID, task, completed) VALUES ($1, $2, $3);`, [userID, task, 'f']
+      , (err) => {
+        if (err) {
+          console.log(err.toString());
+          res.status(500).send({ error: "Something's fishy" })
+        }
+        else {
+          res.status(200).send({ message: "Task added successfully" })
+        }
+      })
+  }
+)
+
 
 module.exports = api;
