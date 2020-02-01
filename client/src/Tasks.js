@@ -12,7 +12,6 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import Checkbox from '@material-ui/core/Checkbox';
 
-
 import AddIcon from '@material-ui/icons/Add';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import CancelIcon from '@material-ui/icons/Cancel';
@@ -20,7 +19,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 
 import axios from "axios";
 
-const styles = theme => ({
+const styles = () => ({
   task: {
     textAlign: "-webkit-center",
     marginBottom: "5%"
@@ -79,18 +78,19 @@ class Task extends React.Component {
   }
 
   componentDidMount() {
+    this.getTasks()
+  }
+
+  getTasks = () => {
     axios.get('/api')
       .then(res => {
         var closed = [], open = []
-        console.log(res.data)
         for (let i = 0; i < res.data.length; i++) {
           if (res.data[i].completed)
             closed.push(res.data[i])
           else
             open.push(res.data[i])
         }
-        console.log(open)
-        console.log(closed)
         this.setState({
           closed: closed,
           open: open
@@ -101,7 +101,7 @@ class Task extends React.Component {
       })
   }
 
-  handleAdd = () => {
+  handleAddBtn = () => {
     this.setState({
       showAddTask: true
     })
@@ -127,31 +127,38 @@ class Task extends React.Component {
     axios
       .post('/api/new-task', body)
       .then(res => {
+        this.getTasks()
       })
       .finally(
         this.setState({
+          newTask: "",
           showAddTask: false
         })
       )
   }
 
-
   signOut = () => {
     axios
       .post("/api/signout")
       .then(res => {
-        console.log(window.user);
         window.user = null;
         window.location.reload()
-        console.log(window.user);
       })
       .catch(e => {
         console.log(e);
       })
   }
 
-
-  handleChecked = (i) => {
+  handleCheck = (i) => {
+    var body = {
+      id: this.state.open[i].id,
+      status: 't'
+    }
+    axios
+      .post('/api/update-status', body)
+      .catch(e => {
+        console.log(e);
+      })
     var openTasks = this.state.open
     var closedTasks = this.state.closed
     var changedTask = this.state.open[i]
@@ -162,11 +169,20 @@ class Task extends React.Component {
       open: openTasks,
       closed: closedTasks,
     })
-    console.log(this.state.open);
-    console.log(this.state.closed);
   }
 
-  handleUnchecked = (i) => {
+  handleUncheck = (i) => {
+    var body = {
+      id: this.state.closed[i].id,
+      status: 'f'
+    }
+    axios
+      .post('/api/update-status', body)
+      .then(res => {
+      })
+      .catch(e => {
+        console.log(e);
+      })
     var openTasks = this.state.open
     var closedTasks = this.state.closed
     var changedTask = this.state.closed[i]
@@ -177,20 +193,31 @@ class Task extends React.Component {
       open: openTasks,
       closed: closedTasks,
     })
-    console.log(this.state.open);
-    console.log(this.state.closed);
+  }
+
+  handleDelete = (id) => {
+    var body = {
+      id: id
+    }
+    axios
+      .post("/api/delete-task", body)
+      .then(res => {
+        this.getTasks()
+      })
+      .catch(e => {
+        console.log(e);
+      })
   }
 
   render() {
     const { classes } = this.props;
-    // const { open, closed } = this.state
     return (
       <div className={classes.task}>
         <div className={classes.header}>
           <Button
             variant="outlined"
             color="primary"
-            onClick={this.handleAdd}
+            onClick={this.handleAddBtn}
             className={classes.addNewBtn}
           >
             <AddIcon />
@@ -247,11 +274,11 @@ class Task extends React.Component {
                     <ListItemIcon>
                       <Checkbox
                         color="primary"
-                        onChange={() => this.handleChecked(i)}
+                        onChange={() => this.handleCheck(i)}
                       />
                     </ListItemIcon>
                     <ListItemText primary={task.task} />
-                    <ListItemIcon>
+                    <ListItemIcon onClick={() => this.handleDelete(task.id)}>
                       <DeleteIcon />
                     </ListItemIcon>
                   </ListItem>
@@ -268,12 +295,14 @@ class Task extends React.Component {
                     <ListItemIcon style={{ opacity: "50%" }}>
                       <Checkbox
                         defaultChecked
-                        onChange={() => this.handleUnchecked(i)}
+                        onChange={() => this.handleUncheck(i)}
                         color="primary"
                       />
                     </ListItemIcon>
                     <ListItemText primary={task.task} style={{ opacity: "50%" }} />
-
+                    <ListItemIcon onClick={() => this.handleDelete(task.id)}>
+                      <DeleteIcon />
+                    </ListItemIcon>
                   </ListItem>
                 )
               })

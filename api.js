@@ -128,7 +128,7 @@ api.use((req, res, next) => {
 })
 
 
-//Endpoint: /api/
+//Endpoint: /api - To retrieve all tasks from DB
 api.get('/', (req, res) => {
   if (req.session.user) {
     var id = req.session.user.id
@@ -156,7 +156,7 @@ api.post('/new-task', (req, res, next) => {
   }
 }, (req, res) => {
   var { userID, task } = req.body
-  pool.query(`INSERT INTO tasks (userID, task, completed) VALUES ($1, $2, $3);`, [userID, task, 't']
+  pool.query(`INSERT INTO tasks (userID, task, completed) VALUES ($1, $2, $3);`, [userID, task, 'f']
     , (err) => {
       if (err) {
         console.log(err.toString());
@@ -168,6 +168,47 @@ api.post('/new-task', (req, res, next) => {
     })
 })
 
+
+//Endpoint: /api/update-status
+api.post('/update-status', (req, res) => {
+  if (req.body.id && req.body.status) {
+    var { id, status } = req.body
+    pool.query(`UPDATE tasks SET completed = $2 WHERE id = $1;`, [id, status]
+      , (err, results) => {
+        if (err) {
+          console.log(err.toString());
+          res.status(500).send({ error: "Something's fishy" })
+        }
+        else {
+          res.status(200).send({ message: "Status updated successfully" })
+        }
+      })
+  }
+  else {
+    res.status(400).send({ error: "Request body is incomplete" })
+  }
+})
+
+//Endpoint: /api/delete-task
+api.post('/delete-task', (req, res) => {
+  if (req.body.id) {
+    var id = req.body.id
+    pool.query(`DELETE FROM tasks WHERE id=$1;`, [id]
+      , (err, results) => {
+        if (err) {
+          console.log(err.toString());
+          res.status(500).send({ error: "Someting's fishy" })
+        }
+        else {
+          res.status(200).send({ message: "Task Deleted Successfully" })
+        }
+      })
+  }
+  else {
+    res.status(400).send({ error: "Request body is incomplete" })
+  }
+
+})
 
 
 module.exports = api;

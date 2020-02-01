@@ -103,7 +103,6 @@ class Login extends Component {
     axios
       .post("/api/signin", body)
       .then(res => {
-        console.log(res.data);
         window.userID = res.data.id
         window.userName = res.data.name
         this.props.setDetails();
@@ -123,10 +122,10 @@ class Login extends Component {
     axios
       .post("/api/signup", body)
       .then(res => {
-        console.log(res.data);
         window.useruserID = res.data.id
         window.userName = res.data.name
         this.props.setDetails();
+        window.location.reload()
       })
       .catch(e => {
         console.log(e);
