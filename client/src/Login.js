@@ -103,7 +103,9 @@ class Login extends Component {
     axios
       .post("/api/signin", body)
       .then(res => {
-        window.user = res.data.user
+        console.log(res.data);
+        window.userID = res.data.id
+        window.userName = res.data.name
         this.props.setDetails();
       })
       .catch(e => {
@@ -112,6 +114,7 @@ class Login extends Component {
   };
 
   signUp = () => {
+    // TODO: Problem - Have to reload to enter
     var body = {
       user: this.state.username,
       email: this.state.email,
@@ -120,8 +123,9 @@ class Login extends Component {
     axios
       .post("/api/signup", body)
       .then(res => {
-        console.log(res);
-        window.user = res.data.user
+        console.log(res.data);
+        window.useruserID = res.data.id
+        window.userName = res.data.name
         this.props.setDetails();
       })
       .catch(e => {

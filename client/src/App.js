@@ -34,7 +34,7 @@ class App extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      user: window.user
+      userID: window.userID,
     }
   }
 
@@ -42,7 +42,8 @@ class App extends React.Component {
     axios.post('/api/whoami')
       .then(res => {
         if (res.data) {
-          window.user = res.data
+          window.userID = res.data.id
+          window.userName = res.data.name
           this.setDetails()
         }
       })
@@ -53,17 +54,17 @@ class App extends React.Component {
 
   setDetails = () => {
     this.setState({
-      user: window.user
+      userID: window.userID,
     })
   }
 
   render() {
     return (
       <MuiThemeProvider theme={theme}>
-        {!this.state.user &&
+        {!this.state.userID &&
           <Login setDetails={this.setDetails} />
         }
-        {this.state.user &&
+        {this.state.userID &&
           <Tasks />
         }
       </MuiThemeProvider>

@@ -6,12 +6,11 @@ const { Pool } = require("pg");
 const api = express.Router();
 
 api.use(bodyParser.json());
-console.log(process.env.DATABASE_URL);
 
 var pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: true
-});
+})
 
 
 // Hashing Function
@@ -24,8 +23,11 @@ function hash(input, salt) {
 // Endpoint: /api/whoami
 api.post("/whoami", (req, res) => {
   if (req.session.user) {
-    var id = req.session.user
-    res.status(200).send(id)
+    var user = {
+      id: req.session.user.id,
+      name: req.session.user.name,
+    }
+    res.status(200).send(user)
   }
   else
     res.send(null)
@@ -50,15 +52,20 @@ api.post("/signup", (req, res, next) => {
       }
       else
         console.log("Sign Up Success");
-      pool.query(`SELECT id,password FROM users WHERE username = $1`, [user]
+      pool.query(`SELECT id, username, password FROM users WHERE username = $1`, [user]
         , (err, results) => {
           if (err) {
-            console.log(err.toString);
+            console.log(err.toString());
             res.status(500).send({ error: "Something's fishy" })
           }
-          else
-            req.session.user = results.rows[0].id
-          res.status(200).send(req.session)
+          else {
+            var user = {
+              id: results.rows[0].id,
+              name: results.rows[0].username,
+            }
+            req.session.user = user
+          }
+          res.status(200).send(req.session.user)
         }
       );
     });
@@ -73,7 +80,7 @@ api.post("/signin", (req, res, next) => {
     res.status(400).send({ error: "Request body is incomplete" });
 }, (req, res) => {
   var { user, pass } = req.body;
-  pool.query(`SELECT id,password FROM users WHERE username = $1`, [user]
+  pool.query(`SELECT id, username, password FROM users WHERE username = $1`, [user]
     , (err, results) => {
       if (err) {
         console.log(err.toString())
@@ -90,8 +97,13 @@ api.post("/signin", (req, res, next) => {
           var givenhashed = hash(pass, salt)
           if (givenhashed === actualhashed) {
             console.log("Signed in");
-            req.session.user = results.rows[0].id
-            res.status(200).send(req.session)
+            var user = {
+              id: results.rows[0].id,
+              name: results.rows[0].username,
+            }
+            req.session.user = user
+
+            res.status(200).send(req.session.user)
           }
           else {
             res.status(403).send({ error: "This is why I told you not to forget you're password" })
@@ -99,7 +111,7 @@ api.post("/signin", (req, res, next) => {
           }
         }
     })
-});
+})
 
 
 // Endpoint: /api/signout
@@ -116,6 +128,25 @@ api.use((req, res, next) => {
 })
 
 
+//Endpoint: /api/
+api.get('/', (req, res) => {
+  if (req.session.user) {
+    var id = req.session.user.id
+    pool.query(`SELECT id, task, completed FROM tasks WHERE userid = $1;`, [id]
+      , (err, results) => {
+        if (err)
+          console.log(err);
+        else {
+          var tasks = results.rows
+          res.status(200).send(tasks)
+        }
+      })
+  }
+  else
+    res.status(401).send({ error: 'I think you forgot to sign in.' })
+})
+
+
 //Endpoint: /api/new-task
 api.post('/new-task', (req, res, next) => {
   if (req.body.userID && req.body.task)
@@ -123,25 +154,20 @@ api.post('/new-task', (req, res, next) => {
   else {
     res.status(400).send({ error: "Request body is incomplete" })
   }
-}
-  , (req, res) => {
-    var id = req.body.userID
-    console.log(id);
+}, (req, res) => {
+  var { userID, task } = req.body
+  pool.query(`INSERT INTO tasks (userID, task, completed) VALUES ($1, $2, $3);`, [userID, task, 't']
+    , (err) => {
+      if (err) {
+        console.log(err.toString());
+        res.status(500).send({ error: "Something's fishy" })
+      }
+      else {
+        res.status(200).send({ message: "Task added successfully" })
+      }
+    })
+})
 
-    var { userID, task } = req.body
-    console.log(userID, task);
-    pool.query(`INSERT INTO tasks (userID, task, completed) VALUES ($1, $2, $3);`, [userID, task, 'f']
-      , (err) => {
-        if (err) {
-          console.log(err.toString());
-          res.status(500).send({ error: "Something's fishy" })
-        }
-        else {
-          res.status(200).send({ message: "Task added successfully" })
-        }
-      })
-  }
-)
 
 
 module.exports = api;
