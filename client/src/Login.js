@@ -3,21 +3,40 @@ import React, { Component } from "react";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import Paper from "@material-ui/core/Paper";
+import Typography from "@material-ui/core/Typography";
 import withStyles from '@material-ui/core/styles/withStyles';
+import Checkbox from '@material-ui/core/Checkbox';
 
 import axios from "axios";
 
 const styles = theme => ({
+  root: {
+    textAlign: 'center',
+    paddingTop: '2%',
+  },
+
   paper: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    height: '30%',
-    width: '50%',
-    margin: '-15% 0 0 -25%',
+    [theme.breakpoints.up('md')]: {
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      height: '30%',
+      width: '50%',
+      margin: '-15% 0 0 -25%',
+      display: 'flex',
+      flexDirection: 'column',
+      padding: `${theme.spacing(2)}px ${theme.spacing(3)}px ${theme.spacing(23)}px`,
+    },
+    margin: '15% 10%',
     display: 'flex',
+    padding: `${theme.spacing(2)}px ${theme.spacing(3)}px ${theme.spacing(3)}px`,
     flexDirection: 'column',
-    padding: `${theme.spacing(2)}px ${theme.spacing(3)}px ${theme.spacing(16)}px`,
+  },
+
+  logo: {
+    fontFamily: "Zhi Mang Xing, cursive",
+    fontSize: "3em",
+    color: '#fc0303',
   },
 
   tab: {
@@ -30,7 +49,11 @@ const styles = theme => ({
     flexGrow: '0.5',
     justifyContent: 'center',
     paddingBottom: `${theme.spacing(2)}px`,
-    cursor: 'pointer'
+    cursor: 'pointer',
+    height: 'fit-content',
+    '&.hover': {
+      background: 'black'
+    },
   },
 
   signInBtn: {
@@ -38,7 +61,8 @@ const styles = theme => ({
     flexGrow: '0.5',
     justifyContent: 'center',
     paddingBottom: `${theme.spacing(2)}px`,
-    cursor: 'pointer'
+    cursor: 'pointer',
+    height: 'fit-content'
   },
 
   signUp: {
@@ -70,8 +94,11 @@ class Login extends Component {
       username: "",
       password: "",
       email: "",
+      showPassword: false,
       showSignIn: false,
-      showSignUp: true
+      showSignUp: true,
+      signInError: '',
+      signUpError: '',
     };
   }
 
@@ -95,9 +122,15 @@ class Login extends Component {
     });
   };
 
+  showPassword = () => {
+    this.setState((prevState) => ({
+      showPassword: !prevState.showPassword
+    }))
+  }
+
   signIn = () => {
     var body = {
-      user: this.state.username,
+      user: this.state.username.toLowerCase().trim(),
       pass: this.state.password
     };
     axios
@@ -108,45 +141,65 @@ class Login extends Component {
         this.props.setDetails();
       })
       .catch(e => {
-        console.log(e);
+        this.setState({
+          signInError: e.response.data.error
+        })
       });
   };
 
   signUp = () => {
-    // TODO: Problem - Have to reload to enter
-    var body = {
-      user: this.state.username,
-      email: this.state.email,
-      pass: this.state.password
-    };
-    axios
-      .post("/api/signup", body)
-      .then(res => {
-        window.useruserID = res.data.id
-        window.userName = res.data.name
-        this.props.setDetails();
-        window.location.reload()
+    if (/\S+@\S+\.\S+/.test(this.state.email)) {
+      var body = {
+        user: this.state.username.toLowerCase().trim(),
+        email: this.state.email.toLowerCase().trim(),
+        pass: this.state.password
+      };
+      axios
+        .post("/api/signup", body)
+        .then(res => {
+          window.useruserID = res.data.id
+          window.userName = res.data.name
+          this.props.setDetails();
+          window.location.reload()
+        })
+        .catch(e => {
+          this.setState({
+            signUpError: e.response.data.error
+          })
+        });
+    }
+    else {
+      this.setState({
+        signUpError: "I haven't seen this kind of an email in my life"
       })
-      .catch(e => {
-        console.log(e);
-      });
+    }
   };
 
   render() {
     const { classes } = this.props;
     return (
       <div className={classes.root}>
+        <span className={classes.logo}>
+          {"{  ToDo }"}
+        </span>
         <Paper elevation={4} className={classes.paper}>
           <div className={classes.tab}>
             <div onClick={this.toggleSignUp} className={classes.signUpBtn}>
-              {"Sign Up"}
+              <Typography color='primary' variant="button" style={{ fontSize: "1.1em" }}>
+                {"Sign Up"}
+              </Typography>
             </div>
             <div onClick={this.toggleSignIn} className={classes.signInBtn}>
-              {"Sign In"}
+              <Typography color='primary' variant="button" style={{ fontSize: "1.1em" }}>
+                {"Sign In"}
+              </Typography>
             </div>
           </div>
           {this.state.showSignUp &&
             <div className={classes.signUp}>
+              <Typography color='primary'>
+                {this.state.signUpError}
+              </Typography>
               <TextField
                 label="Username"
                 variant="outlined"
@@ -163,12 +216,19 @@ class Login extends Component {
               />
               <TextField
                 label="Password"
-                type="password"
+                type={this.state.showPassword ? "text" : "password"}
                 variant="outlined"
                 value={this.state.password}
                 onChange={this.handleChange("password")}
                 className={classes.fields}
               />
+              <div
+                style={{ flexDirection: "row", cursor: 'pointer' }}
+                onClick={this.showPassword}
+              >
+                <Checkbox color="primary" checked={this.state.showPassword} />
+                {"Show Password"}
+              </div>
               <Button
                 onClick={this.signUp}
                 color="primary"
@@ -179,9 +239,11 @@ class Login extends Component {
               </Button>
             </div>
           }
-
           {this.state.showSignIn &&
             <div className={classes.signIn}>
+              <Typography color='primary'>
+                {this.state.signInError}
+              </Typography>
               <TextField
                 label="Username"
                 variant="outlined"
@@ -191,12 +253,19 @@ class Login extends Component {
               />
               <TextField
                 label="Password"
-                type="password"
+                type={this.state.showPassword ? "text" : "password"}
                 variant="outlined"
                 value={this.state.password}
                 onChange={this.handleChange("password")}
                 className={classes.fields}
               />
+              <div
+                style={{ flexDirection: "row", cursor: 'pointer' }}
+                onClick={this.showPassword}
+              >
+                <Checkbox color="primary" checked={this.state.showPassword} />
+                {"Show Password"}
+              </div>
               <Button
                 onClick={this.signIn}
                 color="primary"
@@ -205,9 +274,9 @@ class Login extends Component {
               >
                 {"Sign In"}
               </Button>
-              <span className={classes.forgot}>
-                {"Forgot Password"}
-              </span>
+              <Typography onClick={this.toggleSignUp} style={{ color: "#0000ff", textDecoration: "underline", cursor: "pointer", marginTop: '3%' }}>
+                {"New Here... Jump In"}
+              </Typography>
             </div>
           }
         </Paper>

@@ -19,48 +19,65 @@ import DeleteIcon from '@material-ui/icons/Delete';
 
 import axios from "axios";
 
-const styles = () => ({
+const styles = theme => ({
   task: {
     textAlign: "-webkit-center",
     marginBottom: "5%"
   },
+
   header: {
     margin: "1%",
     textAlignLast: "center",
   },
+
   addNewBtn: {
     position: "absolute",
     left: "1%",
   },
+
   logo: {
     fontFamily: "Zhi Mang Xing, cursive",
     fontSize: "3em",
     color: '#fc0303',
   },
+
   signOut: {
     position: "absolute",
     right: 10,
     top: 10,
   },
+
   card: {
+    [theme.breakpoints.down('md')]: {
+      width: "90%;",
+    },
     height: "50%;",
     width: "50%",
     textAlign: "-webkit-center",
     border: "1px #fc0303 solid",
     marginTop: "2.5%"
   },
+
   addNewDiv: {
     margin: "5%",
   },
+
   newTask: {
     width: "50%",
     border: "1px #fc0303 solid",
     borderRadius: '4px'
   },
+
   cancelBtn: {
     borderRadius: "50%",
     minWidth: "50px",
     minHeight: "50px",
+  },
+
+  deleteDiv: {
+    [theme.breakpoints.down('md')]: {
+      minWidth: "0px"
+    }
   }
 })
 
@@ -243,6 +260,7 @@ class Task extends React.Component {
             <TextField
               variant="outlined"
               color="primary"
+              placeholder="New task to do"
               className={classes.newTask}
               onChange={this.handleChange('newTask')}
             />
@@ -278,29 +296,7 @@ class Task extends React.Component {
                       />
                     </ListItemIcon>
                     <ListItemText primary={task.task} />
-                    <ListItemIcon onClick={() => this.handleDelete(task.id)}>
-                      <DeleteIcon />
-                    </ListItemIcon>
-                  </ListItem>
-                )
-              })
-            }
-          </List>
-
-          <List>
-            {
-              this.state.closed.map((task, i) => {
-                return (
-                  <ListItem key={task.id}>
-                    <ListItemIcon style={{ opacity: "50%" }}>
-                      <Checkbox
-                        defaultChecked
-                        onChange={() => this.handleUncheck(i)}
-                        color="primary"
-                      />
-                    </ListItemIcon>
-                    <ListItemText primary={task.task} style={{ opacity: "50%" }} />
-                    <ListItemIcon onClick={() => this.handleDelete(task.id)}>
+                    <ListItemIcon onClick={() => this.handleDelete(task.id)} className={classes.deleteDiv}>
                       <DeleteIcon />
                     </ListItemIcon>
                   </ListItem>
@@ -314,6 +310,27 @@ class Task extends React.Component {
               {"Nothing Yet :("}
             </Typography>
           }
+          <List>
+            {
+              this.state.closed.map((task, i) => {
+                return (
+                  <ListItem key={task.id}>
+                    <ListItemIcon style={{ opacity: "50%" }}>
+                      <Checkbox
+                        defaultChecked
+                        onChange={() => this.handleUncheck(i)}
+                        color="primary"
+                      />
+                    </ListItemIcon>
+                    <ListItemText primary={task.task} style={{ opacity: "50%" }} />
+                    <ListItemIcon onClick={() => this.handleDelete(task.id)} className={classes.deleteDiv} >
+                      <DeleteIcon />
+                    </ListItemIcon>
+                  </ListItem>
+                )
+              })
+            }
+          </List>
         </Paper>
       </div >
     )
