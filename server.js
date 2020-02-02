@@ -4,7 +4,7 @@ const cors = require("cors");
 const session = require("express-session")
 
 const app = express();
-const port = 6000;
+const port = process.env.PORT || 5000;
 const server = require('http').Server(app)
 
 app.use(session({
