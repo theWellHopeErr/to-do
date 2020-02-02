@@ -42,34 +42,68 @@ api.post("/signup", (req, res, next) => {
     res.status(400).send({ error: "Request body is incomplete" });
 }, (req, res) => {
   var { email, user, pass } = req.body;
-  var salt = crypto.randomBytes(128).toString("hex");
-  var hashedPassword = hash(pass, salt);
-  pool.query(`INSERT INTO users(email, username,password) VALUES($1,$2,$3)`, [email, user, hashedPassword]
-    , (err) => {
+  // Checks if the email is already registered
+  pool.query(`SELECT id FROM users WHERE email=$1;`, [email]
+    , (err, results) => {
       if (err) {
         console.log(err.toString());
-        res.status(500).send({ error: "Something's fishy" });
+        res.status(401).send({ error: "Something's fishy" })
       }
-      else
-        console.log("Sign Up Success");
-      pool.query(`SELECT id, username, password FROM users WHERE username = $1`, [user]
-        , (err, results) => {
-          if (err) {
-            console.log(err.toString());
-            res.status(500).send({ error: "Something's fishy" })
-          }
-          else {
-            var user = {
-              id: results.rows[0].id,
-              name: results.rows[0].username,
-            }
-            req.session.user = user
-          }
-          res.status(200).send(req.session.user)
+      else {
+        if (results.rows.length === 0) {
+          // Checks if the username is already registered
+          pool.query(`SELECT id FROM users WHERE username=$1;`, [user]
+            , (err, results) => {
+              if (err) {
+                console.log(err.toString());
+                res.status(400).send({ error: "Something's fishy" })
+              }
+              else {
+                if (results.rows.length === 0) {
+                  var salt = crypto.randomBytes(128).toString("hex");
+                  var hashedPassword = hash(pass, salt);
+                  // Sign Up Process
+                  pool.query(`INSERT INTO users(email, username,password) VALUES($1,$2,$3)`, [email, user, hashedPassword]
+                    , (err) => {
+                      if (err) {
+                        console.log(err.toString());
+                        res.status(500).send({ error: "Something's fishy" });
+                      }
+                      else
+                        console.log("Sign Up Success");
+                      pool.query(`SELECT id, username, password FROM users WHERE username = $1`, [user]
+                        , (err, results) => {
+                          if (err) {
+                            console.log(err.toString());
+                            res.status(500).send({ error: "Something's fishy" })
+                          }
+                          else {
+                            var user = {
+                              id: results.rows[0].id,
+                              name: results.rows[0].username,
+                            }
+                            req.session.user = user
+                          }
+                          res.status(200).send(req.session.user)
+                        }
+                      );
+                    })
+                }
+                else {
+                  console.log("Ahhh... That username is already taken");
+                  res.status(403).send({ err: "Ahhh... That username is already taken" })
+                }
+              }
+            });
         }
-      );
-    });
-})
+        else {
+          console.log("Looks like you've already registered with that email");
+          res.status(403).send({ err: "Looks like you've already registered with that email" })
+        }
+      }
+    })
+}
+)
 
 
 // Endpoint: /api/signin
