@@ -4,75 +4,72 @@ import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
-import withStyles from '@material-ui/core/styles/withStyles';
-import Checkbox from '@material-ui/core/Checkbox';
+import withStyles from "@material-ui/core/styles/withStyles";
+import Checkbox from "@material-ui/core/Checkbox";
 
 import axios from "axios";
 
 const styles = theme => ({
   root: {
-    textAlign: 'center',
-    paddingTop: '2%',
+    textAlign: "center",
+    paddingTop: "2%",
   },
 
   paper: {
-    [theme.breakpoints.up('md')]: {
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      height: '30%',
-      width: '50%',
-      margin: '-15% 0 0 -25%',
-      display: 'flex',
-      flexDirection: 'column',
+    [theme.breakpoints.up("md")]: {
+      position: "absolute",
+      top: "50%",
+      left: "50%",
+      height: "30%",
+      width: "50%",
+      margin: "-15% 0 0 -25%",
+      display: "flex",
+      flexDirection: "column",
       padding: `${theme.spacing(2)}px ${theme.spacing(3)}px ${theme.spacing(23)}px`,
     },
-    margin: '15% 10%',
-    display: 'flex',
+    margin: "15% 10%",
+    display: "flex",
     padding: `${theme.spacing(2)}px ${theme.spacing(3)}px ${theme.spacing(3)}px`,
-    flexDirection: 'column',
+    flexDirection: "column",
   },
 
   logo: {
     fontFamily: "Zhi Mang Xing, cursive",
     fontSize: "3em",
-    color: '#fc0303',
+    color: "#fc0303",
   },
 
   tab: {
-    display: 'flex',
-    flexDirection: 'row'
+    display: "flex",
+    flexDirection: "row"
   },
 
   signUpBtn: {
-    display: 'flex',
-    flexGrow: '0.5',
-    justifyContent: 'center',
+    display: "flex",
+    flexGrow: "0.5",
+    justifyContent: "center",
     paddingBottom: `${theme.spacing(2)}px`,
-    cursor: 'pointer',
-    height: 'fit-content',
-    '&.hover': {
-      background: 'black'
-    },
+    cursor: "pointer",
+    height: "fit-content",
   },
 
   signInBtn: {
-    display: 'flex',
-    flexGrow: '0.5',
-    justifyContent: 'center',
+    display: "flex",
+    flexGrow: "0.5",
+    justifyContent: "center",
     paddingBottom: `${theme.spacing(2)}px`,
-    cursor: 'pointer',
-    height: 'fit-content'
+    cursor: "pointer",
+    height: "fit-content"
   },
 
   signUp: {
-    display: 'flex',
-    flexDirection: 'column',
+    display: "flex",
+    flexDirection: "column",
   },
 
   signIn: {
-    display: 'flex',
-    flexDirection: 'column',
+    display: "flex",
+    flexDirection: "column",
   },
 
   fields: {
@@ -80,8 +77,8 @@ const styles = theme => ({
   },
 
   forgot: {
-    color: '#0031ff',
-    alignSelf: 'center',
+    color: "#0031ff",
+    alignSelf: "center",
     marginTop: `${theme.spacing(4)}px`,
   },
 })
@@ -97,8 +94,8 @@ class Login extends Component {
       showPassword: false,
       showSignIn: false,
       showSignUp: true,
-      signInError: '',
-      signUpError: '',
+      signInError: "",
+      signUpError: "",
     };
   }
 
@@ -185,19 +182,19 @@ class Login extends Component {
         <Paper elevation={4} className={classes.paper}>
           <div className={classes.tab}>
             <div onClick={this.toggleSignUp} className={classes.signUpBtn}>
-              <Typography color='primary' variant="button" style={{ fontSize: "1.1em" }}>
+              <Typography color="primary" variant="button" style={{ fontSize: "1.1em" }}>
                 {"Sign Up"}
               </Typography>
             </div>
             <div onClick={this.toggleSignIn} className={classes.signInBtn}>
-              <Typography color='primary' variant="button" style={{ fontSize: "1.1em" }}>
+              <Typography color="primary" variant="button" style={{ fontSize: "1.1em" }}>
                 {"Sign In"}
               </Typography>
             </div>
           </div>
           {this.state.showSignUp &&
             <div className={classes.signUp}>
-              <Typography color='primary'>
+              <Typography color="primary">
                 {this.state.signUpError}
               </Typography>
               <TextField
@@ -223,7 +220,7 @@ class Login extends Component {
                 className={classes.fields}
               />
               <div
-                style={{ flexDirection: "row", cursor: 'pointer' }}
+                style={{ flexDirection: "row", cursor: "pointer" }}
                 onClick={this.showPassword}
               >
                 <Checkbox color="primary" checked={this.state.showPassword} />
@@ -241,7 +238,7 @@ class Login extends Component {
           }
           {this.state.showSignIn &&
             <div className={classes.signIn}>
-              <Typography color='primary'>
+              <Typography color="primary">
                 {this.state.signInError}
               </Typography>
               <TextField
@@ -260,7 +257,7 @@ class Login extends Component {
                 className={classes.fields}
               />
               <div
-                style={{ flexDirection: "row", cursor: 'pointer' }}
+                style={{ flexDirection: "row", cursor: "pointer" }}
                 onClick={this.showPassword}
               >
                 <Checkbox color="primary" checked={this.state.showPassword} />
@@ -274,7 +271,7 @@ class Login extends Component {
               >
                 {"Sign In"}
               </Button>
-              <Typography onClick={this.toggleSignUp} style={{ color: "#0000ff", textDecoration: "underline", cursor: "pointer", marginTop: '3%' }}>
+              <Typography onClick={this.toggleSignUp} style={{ color: "#0000ff", textDecoration: "underline", cursor: "pointer", marginTop: "3%" }}>
                 {"New Here... Jump In"}
               </Typography>
             </div>

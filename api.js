@@ -125,7 +125,7 @@ api.post("/signin", (req, res, next) => {
         }
         else {
           var actualhashed = results.rows[0].password
-          var salt = actualhashed.split('$')[2]
+          var salt = actualhashed.split("$")[2]
           var givenhashed = hash(pass, salt)
           if (givenhashed === actualhashed) {
             console.log("Signed in");
@@ -146,7 +146,7 @@ api.post("/signin", (req, res, next) => {
 
 
 // Endpoint: /api/signout
-api.post('/signout', (req, res) => {
+api.post("/signout", (req, res) => {
   delete req.session.user
   res.status(200).send({ message: "See you later" })
 })
@@ -155,12 +155,12 @@ api.use((req, res, next) => {
   if (req.session.user)
     next()
   else
-    res.status(401).send({ error: 'I think you forgot to sign in.' })
+    res.status(401).send({ error: "I think you forgot to sign in." })
 })
 
 
 //Endpoint: /api - To retrieve all tasks from DB
-api.get('/', (req, res) => {
+api.get("/", (req, res) => {
   if (req.session.user) {
     var id = req.session.user.id
     pool.query(`SELECT id, task, completed FROM tasks WHERE userid = $1;`, [id]
@@ -174,12 +174,12 @@ api.get('/', (req, res) => {
       })
   }
   else
-    res.status(401).send({ error: 'I think you forgot to sign in.' })
+    res.status(401).send({ error: "I think you forgot to sign in." })
 })
 
 
 //Endpoint: /api/new-task
-api.post('/new-task', (req, res, next) => {
+api.post("/new-task", (req, res, next) => {
   if (req.body.userID && req.body.task)
     next()
   else {
@@ -187,7 +187,7 @@ api.post('/new-task', (req, res, next) => {
   }
 }, (req, res) => {
   var { userID, task } = req.body
-  pool.query(`INSERT INTO tasks (userID, task, completed) VALUES ($1, $2, $3);`, [userID, task, 'f']
+  pool.query(`INSERT INTO tasks (userID, task, completed) VALUES ($1, $2, $3);`, [userID, task, "f"]
     , (err) => {
       if (err) {
         console.log(err.toString());
@@ -201,7 +201,7 @@ api.post('/new-task', (req, res, next) => {
 
 
 //Endpoint: /api/update-status
-api.post('/update-status', (req, res) => {
+api.post("/update-status", (req, res) => {
   if (req.body.id && req.body.status) {
     var { id, status } = req.body
     pool.query(`UPDATE tasks SET completed = $2 WHERE id = $1;`, [id, status]
@@ -221,7 +221,7 @@ api.post('/update-status', (req, res) => {
 })
 
 //Endpoint: /api/delete-task
-api.post('/delete-task', (req, res) => {
+api.post("/delete-task", (req, res) => {
   if (req.body.id) {
     var id = req.body.id
     pool.query(`DELETE FROM tasks WHERE id=$1;`, [id]

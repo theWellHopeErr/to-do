@@ -1,21 +1,21 @@
 import React from "react";
 
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
-import Paper from '@material-ui/core/Paper';
-import withStyles from '@material-ui/core/styles/withStyles';
+import Button from "@material-ui/core/Button";
+import Typography from "@material-ui/core/Typography";
+import Paper from "@material-ui/core/Paper";
+import withStyles from "@material-ui/core/styles/withStyles";
 import Collapse from "@material-ui/core/Collapse";
 import TextField from "@material-ui/core/TextField";
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import Checkbox from '@material-ui/core/Checkbox';
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import ListItemText from "@material-ui/core/ListItemText";
+import Checkbox from "@material-ui/core/Checkbox";
 
-import AddIcon from '@material-ui/icons/Add';
-import CheckCircleIcon from '@material-ui/icons/CheckCircle';
-import CancelIcon from '@material-ui/icons/Cancel';
-import DeleteIcon from '@material-ui/icons/Delete';
+import AddIcon from "@material-ui/icons/Add";
+import CheckCircleIcon from "@material-ui/icons/CheckCircle";
+import CancelIcon from "@material-ui/icons/Cancel";
+import DeleteIcon from "@material-ui/icons/Delete";
 
 import axios from "axios";
 
@@ -38,7 +38,7 @@ const styles = theme => ({
   logo: {
     fontFamily: "Zhi Mang Xing, cursive",
     fontSize: "3em",
-    color: '#fc0303',
+    color: "#fc0303",
   },
 
   signOut: {
@@ -48,7 +48,7 @@ const styles = theme => ({
   },
 
   card: {
-    [theme.breakpoints.down('md')]: {
+    [theme.breakpoints.down("md")]: {
       width: "90%;",
     },
     height: "50%;",
@@ -65,7 +65,7 @@ const styles = theme => ({
   newTask: {
     width: "50%",
     border: "1px #fc0303 solid",
-    borderRadius: '4px'
+    borderRadius: "4px"
   },
 
   cancelBtn: {
@@ -75,7 +75,7 @@ const styles = theme => ({
   },
 
   deleteDiv: {
-    [theme.breakpoints.down('md')]: {
+    [theme.breakpoints.down("md")]: {
       minWidth: "0px"
     }
   }
@@ -99,7 +99,7 @@ class Task extends React.Component {
   }
 
   getTasks = () => {
-    axios.get('/api')
+    axios.get("/api")
       .then(res => {
         var closed = [], open = []
         for (let i = 0; i < res.data.length; i++) {
@@ -142,7 +142,7 @@ class Task extends React.Component {
       task: this.state.newTask
     }
     axios
-      .post('/api/new-task', body)
+      .post("/api/new-task", body)
       .then(res => {
         this.getTasks()
       })
@@ -169,10 +169,10 @@ class Task extends React.Component {
   handleCheck = (i) => {
     var body = {
       id: this.state.open[i].id,
-      status: 't'
+      status: "t"
     }
     axios
-      .post('/api/update-status', body)
+      .post("/api/update-status", body)
       .catch(e => {
         console.log(e);
       })
@@ -191,10 +191,10 @@ class Task extends React.Component {
   handleUncheck = (i) => {
     var body = {
       id: this.state.closed[i].id,
-      status: 'f'
+      status: "f"
     }
     axios
-      .post('/api/update-status', body)
+      .post("/api/update-status", body)
       .then(res => {
       })
       .catch(e => {
@@ -262,7 +262,7 @@ class Task extends React.Component {
               color="primary"
               placeholder="New task to do"
               className={classes.newTask}
-              onChange={this.handleChange('newTask')}
+              onChange={this.handleChange("newTask")}
             />
             <Button
               className={classes.cancelBtn}
