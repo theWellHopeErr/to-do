@@ -39,7 +39,7 @@ api.post("/signup", (req, res, next) => {
   if (req.body.email && req.body.user && req.body.pass)
     next();
   else
-    res.status(400).send({ error: "Request body is incomplete" });
+    res.status(400).send({ error: "Well, You have to fill all the details to get signed up... Duh..." });
 }, (req, res) => {
   var { email, user, pass } = req.body;
   // Checks if the email is already registered
@@ -90,15 +90,13 @@ api.post("/signup", (req, res, next) => {
                     })
                 }
                 else {
-                  console.log("Ahhh... That username is already taken");
-                  res.status(403).send({ err: "Ahhh... That username is already taken" })
+                  res.status(403).send({ error: "Ahhh... That username is already taken" })
                 }
               }
             });
         }
         else {
-          console.log("Looks like you've already registered with that email");
-          res.status(403).send({ err: "Looks like you've already registered with that email" })
+          res.status(403).send({ error: "Looks like this email is already registered" })
         }
       }
     })
@@ -111,7 +109,7 @@ api.post("/signin", (req, res, next) => {
   if (req.body.user && req.body.pass)
     next();
   else
-    res.status(400).send({ error: "Request body is incomplete" });
+    res.status(400).send({ error: "Well, You have to fill all the details to be signed in... Duh..." });
 }, (req, res) => {
   var { user, pass } = req.body;
   pool.query(`SELECT id, username, password FROM users WHERE username = $1`, [user]
@@ -122,7 +120,7 @@ api.post("/signin", (req, res, next) => {
       }
       else
         if (results.rows.length == 0) {
-          res.status(403).send({ error: "I don't know you" })
+          res.status(403).send({ error: "Mmm... I don't remember you" })
           console.log("I don't know you");
         }
         else {
@@ -141,7 +139,6 @@ api.post("/signin", (req, res, next) => {
           }
           else {
             res.status(403).send({ error: "This is why I told you not to forget you're password" })
-            console.log("This is why I told you not to forget you're password")
           }
         }
     })
