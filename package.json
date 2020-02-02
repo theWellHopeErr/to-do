@@ -1,12 +1,14 @@
 {
   "name": "text-editor",
   "version": "1.0.0",
-  "description": "",
+  "description": "A web application for task management using Node JS, Express JS, React JS, JavaScript, HTML and CSS.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "heroku-postbuild": "cd client && npm install && npm run build"
   },
-  "author": "",
+  "author": "theWellHopeErr",
   "license": "ISC",
   "dependencies": {
     "@material-ui/icons": "^4.5.1",
