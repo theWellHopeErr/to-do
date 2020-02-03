@@ -261,6 +261,7 @@ class Task extends React.Component {
               variant="outlined"
               color="primary"
               placeholder="New task to do"
+              value={this.state.newTask}
               className={classes.newTask}
               onChange={this.handleChange("newTask")}
             />
